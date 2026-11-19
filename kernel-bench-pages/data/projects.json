@@ -1,0 +1,142 @@
+[
+  {
+    "id": "gdpa",
+    "name": "GDPA",
+    "complete": true,
+    "description": "Generalized Dot Product Attention。以激活函数替代 softmax，面向大 batch、变长序列与短 KV 的训练工作负载。",
+    "tags": [
+      "B200 / SM100",
+      "BF16",
+      "B 1152 · H 4 · D 128",
+      "3 场景 × 4 长度"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/gdpa/README.md"
+  },
+  {
+    "id": "tlx_jfa",
+    "name": "TLX Jagged Attention",
+    "navName": "TLX JFA",
+    "complete": true,
+    "description": "基于 TLX 的变长 softmax attention，支持 self / cross attention 与共享 Q 的 PMA 工作负载。",
+    "tags": [
+      "Blackwell",
+      "Softmax attention",
+      "Forward + Backward"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/tlx_jfa/README.md",
+    "statusNote": "覆盖定长、滑动窗口、共享 Q 的 PMA，以及一组较大定长输入。PMA 的 FA4 路径计入 Q 展开和 dQ 跨 batch 求和；不能据小输入结果推断所有 recsys 场景。 已完成的 8 组对照中，目标实现的中位耗时有 3 组更低；相对指定基线的速度范围为 0.43–1.17×。这些是本轮观测值。",
+    "facts": [
+      "Q 与 K/V 使用各自的前缀和 offsets 表示变长序列。",
+      "支持共享 Q 的 PMA 和对称滑动窗口。",
+      "head dimension ≤ 128；反向要求 Q 与 K/V 的 head 数相同。",
+      "2-CTA 反向仅覆盖受限的 PMA 配置，其他配置走 1-CTA 路径。"
+    ],
+    "baseline": "先与 FA4 对齐 softmax 语义、变长表示及前后向计算。共享 Q 场景还需要包含相同的 dQ 跨 batch 累加工作。",
+    "next": [
+      "先确认目标业务是否需要共享 Q 或变长负载均衡。",
+      "对较大输入复测并观察 CTA 数与 GPU 利用率，再判断是否存在调度或访存优化空间。"
+    ],
+    "statusLabel": "首轮实测 · 范围限定"
+  },
+  {
+    "id": "lp_fa4",
+    "name": "LP-FA4",
+    "complete": true,
+    "description": "低精度 FlashAttention-4。提供 BF16 与 MXFP8 接口，重点评估低精度计算的速度、误差与转换开销。",
+    "tags": [
+      "Blackwell SM10x",
+      "BF16 / MXFP8",
+      "CUDA 13"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/lp_fa4/README.md",
+    "statusNote": "使用 README 的 B=8、Q=KV=2048、H=16、D=128，分别测量预量化 MXFP8、同源 BF16 FA4，以及包含转换的路径。原生 benchmark 结果另存，主图使用相同 CUDA Graph 协议进行对照。 已完成的 2 组对照中，目标实现的中位耗时有 2 组更低；相对指定基线的速度范围为 1.18–1.30×。这些是本轮观测值。",
+    "facts": [
+      "初始 MXFP8 API 支持 noncausal、D=128 的 MHA。",
+      "覆盖 dense、packed variable-length 与 shared-query 工作负载。",
+      "参考 benchmark 在计时前完成输入量化。",
+      "反向默认基准使用融合的 MXFP8 dK/dV 输出路径。"
+    ],
+    "baseline": "对比对应的 BF16 FA4 路径；明确输入量化、输出格式和梯度转换的代价，同时报告精度误差。",
+    "next": [
+      "根据业务上下游确认 Q/K/V 是否已量化，以及下游是否接受 MXFP8 梯度。",
+      "将转换成本纳入真实训练链路，并用业务分布评估质量，不只看 kernel-only 加速比。"
+    ],
+    "statusLabel": "首轮实测 · 范围限定"
+  },
+  {
+    "id": "multi_cta_norm_fusion",
+    "name": "Multi-CTA Norm Fusion",
+    "navName": "Norm Fusion",
+    "complete": true,
+    "description": "将 RMSNorm 或 LayerNorm 与 GEMM 融合，减少中间数据读写与归一化的额外开销。",
+    "tags": [
+      "Blackwell",
+      "TLX",
+      "GEMM + Norm"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/multi_cta_norm_fusion/README.md",
+    "statusNote": "固定测试配置可快于 eager 分离实现，但与 cuBLAS + 编译后的归一化比较时，部分融合路径仍更慢。优先把高效分离实现作为优化起点，不能用 eager 加速比判断 kernel 上限。 已完成的 5 组对照中，目标实现的中位耗时有 1 组更低；相对指定基线的速度范围为 0.53–2.17×。这些是本轮观测值。",
+    "facts": [
+      "包含 matmul + RMSNorm / LayerNorm 的前后向实现。",
+      "还包含 RMSNorm → matmul 的路径。",
+      "正确性 harness 默认 ADS_MKL_DISABLE_AUTOTUNE=1。",
+      "性能对照应覆盖相同的完整计算组合。"
+    ],
+    "baseline": "比较融合实现与对应的 GEMM + normalization 分离实现；对齐 affine、epsilon、dtype 与前后向范围。",
+    "next": [
+      "对当前较慢的形状开启 full autotune，再与 compiled 基线重比。",
+      "若仍慢，检查 cluster 同步、occupancy、额外规约及 tile 选择；先分析绝对微秒差。"
+    ],
+    "statusLabel": "首轮实测 · 范围限定"
+  },
+  {
+    "id": "gdpa_megakernel",
+    "name": "GDPA Megakernel",
+    "complete": true,
+    "description": "进一步把归一化与 GDPA 融合，评估 attention 周边算子的整体开销。",
+    "tags": [
+      "Blackwell",
+      "TLX",
+      "GDPA + Norm"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/gdpa_megakernel/README.md",
+    "statusNote": "比较同样的 tanh GELU GDPA、归一化与残差。分别保留 eager 和 compiled Norm 基线。较大补充配置未完成，当前收益结论仅限仓库小输入。 已完成的 2 组对照中，目标实现的中位耗时有 1 组更低；相对指定基线的速度范围为 0.87–1.07×。这些是本轮观测值。",
+    "facts": [
+      "包含融合归一化的 GDPA megakernel。",
+      "已有 fused RMSNorm 与 LayerNorm + RMSNorm 的参考检查。",
+      "正确性测试默认关闭完整 autotune 搜索。",
+      "需要以同一段归一化和 GDPA 计算作为对照。"
+    ],
+    "baseline": "以未融合的 GDPA 和同样的归一化操作组成基线；对齐激活函数、归一化配置、输出和计时范围。",
+    "next": [
+      "根据真实业务确定需要融合的整段计算。",
+      "对较大 shape 开启调优，观察归一化与同步是否抵消中间访存节省。"
+    ],
+    "statusLabel": "部分实测 · 有待解决项"
+  },
+  {
+    "id": "block_attention",
+    "name": "Block Attention",
+    "complete": true,
+    "description": "基于 TLX 的固定块稀疏 attention，面向具有特定分块可见性规则的序列工作负载。",
+    "tags": [
+      "Blackwell",
+      "TLX",
+      "Fixed block sparsity"
+    ],
+    "readme": "https://github.com/facebookresearch/ads_model_kernel_library/blob/b6a6818455c30a4d49860003f5aede956bea1a6e/block_attention/README.md",
+    "statusNote": "TLX Block Attention 与 FA4 都只在各自的 64-token 块内计算 softmax attention。FA4 将每个块视为一条独立变长序列，因此该对照没有把稀疏计算与完整 attention 混在一起。 已完成的 4 组对照中，目标实现的中位耗时有 4 组更低；相对指定基线的速度范围为 1.18–6.16×。这些是本轮观测值。",
+    "facts": [
+      "提供固定块稀疏 attention 实现和参考检查。",
+      "测试包含投影、RoPE 与 block attention 的融合路径。",
+      "README 的运行入口仍引用内部 Buck 路径，需要适配。",
+      "不能与 GDPA benchmark 的变长 sparsity 参数混为一谈。"
+    ],
+    "baseline": "首先对齐固定块 mask 的数学语义；单独评估 attention 与投影 / RoPE 融合，避免比较不同范围的工作。",
+    "next": [
+      "先判断业务是否确实具有块内可见性；性能优势不能替代业务适用性。",
+      "单独评估 projection / RoPE 融合的整体收益，当前柱状图不包含这两步。"
+    ],
+    "statusLabel": "首轮实测 · 范围限定"
+  }
+]

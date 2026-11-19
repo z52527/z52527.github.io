@@ -1,0 +1,310 @@
+{
+  "fwd": {
+    "time_utc": "20261118T095140Z",
+    "mode": "fwd",
+    "gpu": "NVIDIA B200",
+    "capability": [
+      10,
+      0
+    ],
+    "torch_cuda": "12.8",
+    "providers": [
+      "cutedsl_gdpa",
+      "triton_gdpa",
+      "cutlass_fmha",
+      "cutedsl_fa4"
+    ],
+    "seed": 2025,
+    "batch": 1152,
+    "heads": 4,
+    "head_dim": 128,
+    "dtype": "torch.bfloat16",
+    "warmup_ms": 100,
+    "rep_ms": 2000,
+    "quantiles": [
+      0.5,
+      0.2,
+      0.8
+    ],
+    "commits": {
+      "ads_model_kernel_library": "b6a6818455c30a4d49860003f5aede956bea1a6e",
+      "flash-attention": "68bd095cdd338c5171bccb9c200529f3620b85c9"
+    },
+    "packages": {
+      "torch": "2.10.0",
+      "triton": null,
+      "fbtriton": "3.6.1",
+      "nvidia-cutlass-dsl": "4.6.2",
+      "quack-kernels": "0.6.3",
+      "fbgemm-gpu-genai": "1.5.0",
+      "flash-attn-4": "4.0.0b40"
+    },
+    "compatibility_patch_sha256": "7726d7decb0f78c0810cc21a746ce1ba1fd147c6b7d6b1e0adaa0ab70a20f3f8",
+    "power_limit_w": 1000.0,
+    "driver_version": "615.71.10",
+    "validation": {
+      "cutedsl_gdpa": {
+        "provider": "cutedsl_gdpa",
+        "status": "passed_implementation_reference",
+        "input_scale": 0.25,
+        "max_abs_error": 41.34754943847656,
+        "relative_l2": 0.16062775254249573,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "quantized_reference_max_abs_error": 0.0625,
+        "validation_reference": "FP32 QK, degree-6 Taylor, BF16 P, FP32 PV accumulation, BF16 O",
+        "relative_l2_to_implemented_formula": 0.0023410969879478216,
+        "gelu_reference_relative_l2": 0.16062775254249573,
+        "gelu_equivalence": "different_formula"
+      },
+      "triton_gdpa": {
+        "provider": "triton_gdpa",
+        "status": "passed",
+        "max_abs_error": 0.11128616333007812,
+        "relative_l2": 0.002334918826818466,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "quantized_reference_max_abs_error": 0.125,
+        "validation_reference": "FP32 QK, GELU, BF16 P, FP32 PV accumulation, BF16 O"
+      },
+      "cutlass_fmha": {
+        "provider": "cutlass_fmha",
+        "status": "passed",
+        "max_abs_error": 0.0007188767194747925,
+        "relative_l2": 0.0021260313224047422,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03
+      },
+      "cutedsl_fa4": {
+        "provider": "cutedsl_fa4",
+        "status": "passed",
+        "max_abs_error": 0.0007157176733016968,
+        "relative_l2": 0.0021275782492011786,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03
+      }
+    },
+    "additional_validation": {
+      "provider": "cutedsl_gdpa",
+      "status": "failed",
+      "input_scale": 1.0,
+      "max_abs_error": 1098907392.0,
+      "relative_l2": 305325.25,
+      "finite": true,
+      "atol": 0.03,
+      "rtol": 0.03,
+      "quantized_reference_max_abs_error": 524288.0,
+      "validation_reference": "FP32 QK, degree-6 Taylor, BF16 P, FP32 PV accumulation, BF16 O",
+      "relative_l2_to_implemented_formula": 0.002411316614598036,
+      "gelu_reference_relative_l2": 305325.25,
+      "gelu_equivalence": "different_formula"
+    }
+  },
+  "bwd": {
+    "time_utc": "20261119T064144Z",
+    "mode": "bwd",
+    "gpu": "NVIDIA B200",
+    "capability": [
+      10,
+      0
+    ],
+    "torch_cuda": "12.8",
+    "providers": [
+      "cutedsl_gdpa",
+      "triton_gdpa",
+      "cutlass_fmha",
+      "cutedsl_fa4"
+    ],
+    "seed": 2025,
+    "batch": 1152,
+    "heads": 4,
+    "head_dim": 128,
+    "dtype": "torch.bfloat16",
+    "warmup_ms": 100,
+    "rep_ms": 2000,
+    "quantiles": [
+      0.5,
+      0.2,
+      0.8
+    ],
+    "commits": {
+      "ads_model_kernel_library": "b6a6818455c30a4d49860003f5aede956bea1a6e",
+      "flash-attention": "68bd095cdd338c5171bccb9c200529f3620b85c9"
+    },
+    "packages": {
+      "torch": "2.10.0",
+      "triton": null,
+      "fbtriton": "3.6.1",
+      "nvidia-cutlass-dsl": "4.6.2",
+      "quack-kernels": "0.6.3",
+      "fbgemm-gpu-genai": "1.5.0",
+      "flash-attn-4": "4.0.0b40"
+    },
+    "compatibility_patch_sha256": "989eac0a334366a57a0e592758c3c2383cd414ab27939faad985d81413732aae",
+    "power_limit_w": 1000.0,
+    "driver_version": "615.71.10",
+    "validation": {
+      "cutedsl_gdpa": {
+        "provider": "cutedsl_gdpa",
+        "status": "passed_implementation_reference",
+        "input_scale": 0.25,
+        "max_abs_error": 41.34754943847656,
+        "relative_l2": 0.16062775254249573,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "quantized_reference_max_abs_error": 0.0625,
+        "validation_reference": "FP32 QK, degree-6 Taylor, BF16 P, FP32 PV accumulation, BF16 O",
+        "relative_l2_to_implemented_formula": 0.0023410969879478216,
+        "gelu_reference_relative_l2": 0.16062775254249573,
+        "gelu_equivalence": "different_formula"
+      },
+      "triton_gdpa": {
+        "provider": "triton_gdpa",
+        "status": "passed",
+        "input_scale": 0.25,
+        "max_abs_error": 0.11128616333007812,
+        "relative_l2": 0.002334918826818466,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "quantized_reference_max_abs_error": 0.125,
+        "validation_reference": "FP32 QK, tanh GELU, BF16 P, FP32 PV accumulation, BF16 O",
+        "relative_l2_to_implemented_formula": 0.002334918826818466,
+        "gelu_reference_relative_l2": 0.002334918826818466,
+        "gelu_equivalence": "tanh_approximation"
+      },
+      "cutlass_fmha": {
+        "provider": "cutlass_fmha",
+        "status": "passed",
+        "input_scale": 0.25,
+        "max_abs_error": 0.0007188767194747925,
+        "relative_l2": 0.0021260313224047422,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "validation_reference": "FP32 softmax attention"
+      },
+      "cutedsl_fa4": {
+        "provider": "cutedsl_fa4",
+        "status": "passed",
+        "input_scale": 0.25,
+        "max_abs_error": 0.0007157176733016968,
+        "relative_l2": 0.0021275782492011786,
+        "finite": true,
+        "atol": 0.03,
+        "rtol": 0.03,
+        "validation_reference": "FP32 softmax attention"
+      }
+    },
+    "additional_validation": {
+      "provider": "cutedsl_gdpa",
+      "status": "failed",
+      "input_scale": 1.0,
+      "max_abs_error": 1098907392.0,
+      "relative_l2": 305325.25,
+      "finite": true,
+      "atol": 0.03,
+      "rtol": 0.03,
+      "quantized_reference_max_abs_error": 524288.0,
+      "validation_reference": "FP32 QK, degree-6 Taylor, BF16 P, FP32 PV accumulation, BF16 O",
+      "relative_l2_to_implemented_formula": 0.002411316614598036,
+      "gelu_reference_relative_l2": 305325.25,
+      "gelu_equivalence": "different_formula"
+    },
+    "backward_validation": {
+      "cutedsl_gdpa": {
+        "provider": "cutedsl_gdpa",
+        "status": "passed",
+        "input_std": 0.1,
+        "gradients": {
+          "dq": {
+            "finite": true,
+            "relative_l2": 0.0029573864303529263,
+            "max_abs_error": 0.21408843994140625
+          },
+          "dk": {
+            "finite": true,
+            "relative_l2": 0.0023535529617220163,
+            "max_abs_error": 0.14237594604492188
+          },
+          "dv": {
+            "finite": true,
+            "relative_l2": 0.0023486206773668528,
+            "max_abs_error": 0.014862060546875
+          }
+        }
+      },
+      "triton_gdpa": {
+        "provider": "triton_gdpa",
+        "status": "passed",
+        "input_std": 0.1,
+        "gradients": {
+          "dq": {
+            "finite": true,
+            "relative_l2": 0.0023516658693552017,
+            "max_abs_error": 0.16327285766601562
+          },
+          "dk": {
+            "finite": true,
+            "relative_l2": 0.0023534544743597507,
+            "max_abs_error": 0.14237594604492188
+          },
+          "dv": {
+            "finite": true,
+            "relative_l2": 0.002348866080865264,
+            "max_abs_error": 0.014862060546875
+          }
+        }
+      },
+      "cutlass_fmha": {
+        "provider": "cutlass_fmha",
+        "status": "passed",
+        "input_std": 0.1,
+        "gradients": {
+          "dq": {
+            "finite": true,
+            "relative_l2": 0.0023471382446587086,
+            "max_abs_error": 0.00010078959167003632
+          },
+          "dk": {
+            "finite": true,
+            "relative_l2": 0.002351598348468542,
+            "max_abs_error": 8.307769894599915e-05
+          },
+          "dv": {
+            "finite": true,
+            "relative_l2": 0.0024648781400173903,
+            "max_abs_error": 0.0007786005735397339
+          }
+        }
+      },
+      "cutedsl_fa4": {
+        "provider": "cutedsl_fa4",
+        "status": "passed",
+        "input_std": 0.1,
+        "gradients": {
+          "dq": {
+            "finite": true,
+            "relative_l2": 0.002341626677662134,
+            "max_abs_error": 9.126029908657074e-05
+          },
+          "dk": {
+            "finite": true,
+            "relative_l2": 0.002350733382627368,
+            "max_abs_error": 9.155087172985077e-05
+          },
+          "dv": {
+            "finite": true,
+            "relative_l2": 0.0024650932755321264,
+            "max_abs_error": 0.0007786005735397339
+          }
+        }
+      }
+    }
+  }
+}
